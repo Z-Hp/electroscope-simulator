@@ -646,24 +646,73 @@ function ReportQuestionModal({ question, selectedAnswer, onClose }: {
   const handleSend = async () => {
     setStatus("sending");
     try {
-      const res = await fetch("/api/report-question", {
+      const correctOption = question?.options?.find((o: any) => o.value === question?.correctAnswer);
+      const correctLabel = correctOption ? correctOption.label : question?.correctAnswer;
+
+      const optionsText = (question?.options || [])
+        .map((o: any, i: number) => {
+          const isCorrect = o.value === question?.correctAnswer;
+          const isSelected = o.value === selectedAnswer;
+          let line = `${i + 1}. ${o.label}`;
+          if (isCorrect) line += " ✓ (پاسخ صحیح)";
+          if (isSelected) line += " ← (انتخاب کاربر)";
+          if (!isCorrect && question?.wrongExplanations?.[o.value]) {
+            line += `\n   علت نادرستی: ${question.wrongExplanations[o.value]}`;
+          }
+          return line;
+        })
+        .join("\n");
+
+      const wrongText = question?.wrongExplanations && Object.keys(question.wrongExplanations).length > 0
+        ? "\n\nبررسی علت نادرستی سایر گزینه‌ها:\n" + Object.entries(question.wrongExplanations).map(([val, reason]: [string, any]) => {
+            const opt = (question?.options || []).find((o: any) => o.value === val);
+            return `- «${opt ? opt.label : val}»: ${reason}`;
+          }).join("\n")
+        : "";
+
+      const emailText = `گزارش سؤال نادرست — شبیه‌ساز الکتروسکوپ
+
+زمان: ${new Date().toISOString()}
+
+متن سؤال:
+${question?.questionText || ""}
+
+گزینه‌ها:
+${optionsText}
+
+پاسخ صحیح: ${correctLabel}
+
+توضیح علمی:
+${question?.explanation || ""}
+${wrongText}
+
+سناریو:
+- بار الکتروسکوپ: ${question?.scenario?.electroscopeCharge || "?"}
+- بار میله: ${question?.scenario?.rodCharge || "?"}
+- نوع آزمایش: ${question?.scenario?.experimentType === "contact" ? "تماس" : "نزدیک کردن"}
+- مقدار بار: ${question?.scenario?.rodMagnitude || "?"}
+
+یادداشت کاربر: ${note || "(بدون توضیح)"}
+
+ایمیل کاربر: ${userEmail || "(بدون ایمیل)"}
+`;
+
+      const res = await fetch("https://formspree.io/f/7e1cc308-4ef8-427f-a54a-20ece07afaf7", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
         body: JSON.stringify({
-          questionText: question?.questionText || "",
-          options: question?.options || [],
-          correctAnswer: question?.correctAnswer || "",
-          selectedAnswer: selectedAnswer || "",
-          explanation: question?.explanation || "",
-          wrongExplanations: question?.wrongExplanations || {},
-          scenario: question?.scenario || {},
-          reportNote: note,
-          userEmail: userEmail || "",
+          subject: "📋 گزارش سؤال نادرست — شبیه‌ساز الکتروسکوپ",
+          message: emailText,
+          _replyto: userEmail || "",
         }),
       });
+
       if (res.ok) {
         setStatus("sent");
-        setTimeout(() => onClose(), 2000);
+        setTimeout(() => onClose(), 2500);
       } else {
         setStatus("error");
       }
@@ -682,7 +731,7 @@ function ReportQuestionModal({ question, selectedAnswer, onClose }: {
       onClick={onClose}
     >
       <motion.div
-        className="w-full max-w-md rounded-3xl p-6"
+        className="w-full max-w-md rounded-3xl p-6 max-h-[90vh] overflow-y-auto sim-scroll"
         style={{ background: "var(--sim-card)", border: "1px solid var(--sim-border)" }}
         initial={{ y: 20, scale: 0.96 }}
         animate={{ y: 0, scale: 1 }}
@@ -694,15 +743,15 @@ function ReportQuestionModal({ question, selectedAnswer, onClose }: {
           </div>
           <div>
             <h2 className="text-lg font-extrabold" style={{ color: "var(--sim-fg)" }}>گزارش سؤال</h2>
-            <p className="text-[11px]" style={{ color: "var(--sim-muted)" }}>اگر این سؤال از نظر علمی نادرست است، گزارش کنید</p>
+            <p className="text-[11px]" style={{ color: "var(--sim-muted)" }>اگر این سؤال از نظر علمی نادرست است، گزارش کنید</p>
           </div>
         </div>
 
         {/* Question summary */}
-        <div className="rounded-xl p-3 mb-3 text-[11px] max-h-40 overflow-y-auto sim-scroll" style={{ background: "#eaf4fc", border: "1px solid var(--sim-border)" }}>
+        <div className="rounded-xl p-3 mb-3 text-[11px] max-h-32 overflow-y-auto sim-scroll" style={{ background: "#eaf4fc", border: "1px solid var(--sim-border)" }}>
           <div className="font-bold mb-1" style={{ color: "var(--sim-accent)" }}>متن سؤال:</div>
           <p className="leading-5 mb-2" style={{ color: "var(--sim-fg)" }}>{question?.questionText}</p>
-          <div className="font-bold mb-1" style={{ color: "var(--sim-accent)" }}>پاسخ صحیح:</div>
+          <div className="font-bold mb-1" style={{ color: "#16a34a" }}>پاسخ صحیح:</div>
           <p className="leading-5" style={{ color: "var(--sim-fg)" }}>
             {question?.options?.find((o: any) => o.value === question?.correctAnswer)?.label}
           </p>
