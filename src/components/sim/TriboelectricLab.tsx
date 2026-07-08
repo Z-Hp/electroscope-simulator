@@ -31,7 +31,7 @@ export function TriboelectricLab() {
   const rodChargeInfo = chargeLabel(rodCharge);
 
   return (
-    <div className="grid lg:grid-cols-[280px_1fr_280px] gap-4 h-full">
+    <div className="grid grid-cols-1 xl:grid-cols-[240px_1fr_240px] gap-4 h-full">
       {/* Left: materials */}
       <Card className="p-4 flex flex-col gap-3 sim-scroll overflow-y-auto" style={{ background: "var(--sim-card)", borderColor: "var(--sim-border)" }}>
         <div>
