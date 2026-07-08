@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import nodemailer from "nodemailer";
 
 const REPORT_EMAIL =
   process.env.REPORT_EMAIL_TO || "amozeshgah.farda@gmail.com";
@@ -18,50 +19,15 @@ export async function POST(req: NextRequest) {
       userEmail,
     } = body;
 
-    const report = {
-      id: Date.now().toString(),
-      timestamp: new Date().toISOString(),
-      questionText,
-      options,
-      correctAnswer,
-      selectedAnswer,
-      explanation,
-      wrongExplanations: wrongExplanations || {},
-      scenario,
-      reportNote: reportNote || "",
-      userEmail: userEmail || "",
-    };
-
-    // 1. Try to save to local JSON file (works locally, may fail on serverless)
-    try {
-      const fs = await import("fs");
-      const path = await import("path");
-      const reportsDir = path.join(process.cwd(), "data");
-      if (!fs.default.existsSync(reportsDir)) {
-        fs.default.mkdirSync(reportsDir, { recursive: true });
-      }
-      const reportPath = path.join(reportsDir, "question-reports.json");
-      let reports: any[] = [];
-      if (fs.default.existsSync(reportPath)) {
-        reports = JSON.parse(fs.default.readFileSync(reportPath, "utf-8"));
-      }
-      reports.push(report);
-      fs.default.writeFileSync(reportPath, JSON.stringify(reports, null, 2));
-    } catch (fileErr) {
-      // File saving failed (e.g., on Netlify serverless) — that's OK
-      console.log("File save skipped (serverless environment)");
-    }
-
-    // 2. Send email via Nodemailer (Gmail)
     const gmailUser = process.env.GMAIL_USER;
     const gmailPass = process.env.GMAIL_APP_PASSWORD;
 
     let emailSent = false;
+    let emailError = "";
 
     if (gmailUser && gmailPass && gmailPass !== "your-app-password-here") {
       try {
-        const nodemailer = await import("nodemailer");
-        const transporter = nodemailer.default.createTransport({
+        const transporter = nodemailer.createTransport({
           service: "gmail",
           auth: { user: gmailUser, pass: gmailPass },
         });
@@ -121,30 +87,24 @@ export async function POST(req: NextRequest) {
         const emailHtml = `
           <div dir="rtl" style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <h2 style="color: #1d6fd6;">📋 گزارش سؤال نادرست — شبیه‌ساز الکتروسکوپ</h2>
-            <p style="color: #666; font-size: 12px;">زمان: ${report.timestamp}</p>
-
+            <p style="color: #666; font-size: 12px;">زمان: ${new Date().toISOString()}</p>
             <div style="background: #f0f6fc; padding: 15px; border-radius: 10px; margin: 10px 0;">
               <strong style="color: #1d6fd6;">متن سؤال:</strong>
               <p style="margin: 5px 0;">${questionText}</p>
             </div>
-
             <div style="background: #fff; padding: 15px; border: 1px solid #ddd; border-radius: 10px; margin: 10px 0;">
               <strong style="color: #1d6fd6;">گزینه‌ها و پاسخ صحیح:</strong>
               <div style="margin: 5px 0;">${optionsHtml}</div>
             </div>
-
             <div style="background: #d9f0e4; padding: 12px 15px; border: 2px solid #16a34a; border-radius: 10px; margin: 10px 0;">
               <strong style="color: #065f46;">✓ پاسخ صحیح:</strong>
               <span style="font-weight: bold; color: #065f46;"> ${correctLabel}</span>
             </div>
-
             <div style="background: #fff; padding: 15px; border: 1px solid #ddd; border-radius: 10px; margin: 10px 0;">
               <strong style="color: #1d6fd6;">توضیح علمی:</strong>
               <p style="margin: 5px 0;">${explanation}</p>
             </div>
-
             ${wrongExplanationsHtml}
-
             <div style="background: #fef9e7; padding: 15px; border-radius: 10px; margin: 10px 0;">
               <strong style="color: #854d0e;">سناریوی آزمایش:</strong>
               <ul style="margin: 5px 0; padding-right: 20px;">
@@ -154,20 +114,17 @@ export async function POST(req: NextRequest) {
                 <li>مقدار بار: ${scenario?.rodMagnitude || "?"}</li>
               </ul>
             </div>
-
             <div style="background: #fee2e2; padding: 15px; border-radius: 10px; margin: 10px 0;">
               <strong style="color: #991b1b;">یادداشت کاربر:</strong>
               <p style="margin: 5px 0;">${reportNote || "(بدون توضیح)"}</p>
             </div>
-
             ${
               userEmail
                 ? `
             <div style="background: #e0f2fe; padding: 15px; border: 2px solid #0ea5e9; border-radius: 10px; margin: 10px 0;">
               <strong style="color: #075985;">📧 ایمیل کاربر (برای پاسخ):</strong>
               <p style="margin: 5px 0; font-size: 14px; font-weight: bold;">${userEmail}</p>
-            </div>
-            `
+            </div>`
                 : ""
             }
           </div>
@@ -182,9 +139,8 @@ export async function POST(req: NextRequest) {
         });
 
         emailSent = true;
-        console.log("Report email sent successfully");
-      } catch (emailErr) {
-        console.error("Email send failed:", emailErr);
+      } catch (emailErr: any) {
+        emailError = emailErr?.message || "Unknown email error";
       }
     }
 
@@ -195,7 +151,6 @@ export async function POST(req: NextRequest) {
         : "گزارش شما ثبت شد. متشکریم!",
     });
   } catch (error) {
-    console.error("Report error:", error);
     return NextResponse.json(
       { success: false, message: "خطا در ثبت گزارش" },
       { status: 500 },
