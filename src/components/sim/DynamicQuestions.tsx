@@ -643,7 +643,7 @@ function ReportQuestionModal({ question, selectedAnswer, onClose }: {
   const [userEmail, setUserEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
-  const handleSend = async () => {
+    const handleSend = async () => {
     setStatus("sending");
     try {
       const correctOption = question?.options?.find((o: any) => o.value === question?.correctAnswer);
@@ -675,16 +675,16 @@ function ReportQuestionModal({ question, selectedAnswer, onClose }: {
 زمان: ${new Date().toISOString()}
 
 متن سؤال:
-${question?.questionText || ""}
+ ${question?.questionText || ""}
 
 گزینه‌ها:
-${optionsText}
+ ${optionsText}
 
 پاسخ صحیح: ${correctLabel}
 
 توضیح علمی:
-${question?.explanation || ""}
-${wrongText}
+ ${question?.explanation || ""}
+ ${wrongText}
 
 سناریو:
 - بار الکتروسکوپ: ${question?.scenario?.electroscopeCharge || "?"}
@@ -697,16 +697,18 @@ ${wrongText}
 ایمیل کاربر: ${userEmail || "(بدون ایمیل)"}
 `;
 
-      const res = await fetch("https://formspree.io/f/7e1cc308-4ef8-427f-a54a-20ece07afaf7", {
+      const res = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
         body: JSON.stringify({
+          access_key: "7e1cc308-4ef8-427f-a54a-20ece07afaf7",
           subject: "📋 گزارش سؤال نادرست — شبیه‌ساز الکتروسکوپ",
           message: emailText,
-          _replyto: userEmail || "",
+          from_name: "شبیه‌ساز الکتروسکوپ",
+          replyto: userEmail || "",
         }),
       });
 
