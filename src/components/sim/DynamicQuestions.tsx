@@ -26,10 +26,16 @@ import {
 } from "lucide-react";
 import { QuestionType } from "@/lib/sim-content-dynamic";
 
-const QUESTION_TYPE_LABELS: Record<QuestionType, { label: string; emoji: string }> = {
+const QUESTION_TYPE_LABELS: Record<
+  QuestionType,
+  { label: string; emoji: string }
+> = {
   "predict-result": { label: "پیش‌بینی نتیجه", emoji: "🔮" },
   "identify-rod-charge": { label: "تشخیص بار میله", emoji: "🔍" },
-  "identify-electroscope-charge": { label: "تشخیص بار الکتروسکوپ", emoji: "🔬" },
+  "identify-electroscope-charge": {
+    label: "تشخیص بار الکتروسکوپ",
+    emoji: "🔬",
+  },
   "identify-experiment-type": { label: "نوع آزمایش", emoji: "📋" },
   "analyze-cause": { label: "تحلیل علت", emoji: "💡" },
   "predict-continuation": { label: "پیش‌بینی ادامه", emoji: "⏭️" },
@@ -64,22 +70,34 @@ export function DynamicQuestions() {
 
   // Show end-of-practice report
   if (questionPracticeEnded) {
-    return <PracticeReport onReset={resetQuestionPractice} onExit={() => setView("lab")} />;
+    return (
+      <PracticeReport
+        onReset={resetQuestionPractice}
+        onExit={() => setView("lab")}
+      />
+    );
   }
 
   if (!currentQuestion) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <Brain className="w-12 h-12 mx-auto mb-3 animate-pulse" style={{ color: "var(--sim-accent)" }} />
-          <p className="text-sm" style={{ color: "var(--sim-muted)" }}>در حال ساخت سؤال...</p>
+          <Brain
+            className="w-12 h-12 mx-auto mb-3 animate-pulse"
+            style={{ color: "var(--sim-accent)" }}
+          />
+          <p className="text-sm" style={{ color: "var(--sim-muted)" }}>
+            در حال ساخت سؤال...
+          </p>
         </div>
       </div>
     );
   }
 
   const typeInfo = QUESTION_TYPE_LABELS[currentQuestion.type];
-  const correct = questionAnswered && questionSelectedAnswer === currentQuestion.correctAnswer;
+  const correct =
+    questionAnswered &&
+    questionSelectedAnswer === currentQuestion.correctAnswer;
   const canGoPrev = questionHistoryIndex > 0;
   const isAtEnd = questionHistoryIndex >= questionHistory.length - 1;
 
@@ -88,23 +106,47 @@ export function DynamicQuestions() {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "var(--sim-accent)", color: "#fff" }}>
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center"
+            style={{ background: "var(--sim-accent)", color: "#fff" }}
+          >
             <Brain className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-lg font-extrabold" style={{ color: "var(--sim-fg)" }}>سؤالات پویا</h1>
-            <p className="text-[10px]" style={{ color: "var(--sim-muted)" }}>موتور تولید سؤال هوشمند</p>
+            <h1
+              className="text-lg font-extrabold"
+              style={{ color: "var(--sim-fg)" }}
+            >
+              سؤالات پویا
+            </h1>
+            <p className="text-[10px]" style={{ color: "var(--sim-muted)" }}>
+              موتور تولید سؤال هوشمند
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl" style={{ background: "var(--sim-card)", border: "1px solid var(--sim-border)" }}>
-            <span className="text-xs font-bold flex items-center gap-1" style={{ color: "#16a34a" }}>
+          <div
+            className="flex items-center gap-2 px-3 py-1.5 rounded-xl"
+            style={{
+              background: "var(--sim-card)",
+              border: "1px solid var(--sim-border)",
+            }}
+          >
+            <span
+              className="text-xs font-bold flex items-center gap-1"
+              style={{ color: "#16a34a" }}
+            >
               <CheckCircle2 className="w-3.5 h-3.5" /> {questionCorrectCount}
             </span>
-            <span className="text-xs font-bold flex items-center gap-1" style={{ color: "#dc2626" }}>
+            <span
+              className="text-xs font-bold flex items-center gap-1"
+              style={{ color: "#dc2626" }}
+            >
               <XCircle className="w-3.5 h-3.5" /> {questionWrongCount}
             </span>
-            <span className="text-[10px]" style={{ color: "var(--sim-muted)" }}>از {questionTotalCount}</span>
+            <span className="text-[10px]" style={{ color: "var(--sim-muted)" }}>
+              از {questionTotalCount}
+            </span>
           </div>
           {/* Previous / Next question navigation */}
           <button
@@ -170,29 +212,47 @@ export function DynamicQuestions() {
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.3 }}
         >
-          <Card className="p-5 mb-4" style={{ background: "var(--sim-card)", borderColor: "var(--sim-border)" }}>
+          <Card
+            className="p-5 mb-4"
+            style={{
+              background: "var(--sim-card)",
+              borderColor: "var(--sim-border)",
+            }}
+          >
             {/* Question type badge */}
             <div className="flex items-center gap-2 mb-4">
               <span className="text-2xl">{typeInfo.emoji}</span>
               <span
                 className="text-[10px] font-bold px-2.5 py-1 rounded-full"
-                style={{ background: "var(--sim-accent-soft)", color: "var(--sim-accent)" }}
+                style={{
+                  background: "var(--sim-accent-soft)",
+                  color: "var(--sim-accent)",
+                }}
               >
                 {typeInfo.label}
               </span>
               {currentQuestion.isErrorScenario && (
-                <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: "#fee2e2", color: "#dc2626" }}>
+                <span
+                  className="text-[10px] font-bold px-2.5 py-1 rounded-full"
+                  style={{ background: "#fee2e2", color: "#dc2626" }}
+                >
                   ⚠️ سناریوی خطادار
                 </span>
               )}
-              <span className="text-[10px] mr-auto" style={{ color: "var(--sim-muted)" }}>
+              <span
+                className="text-[10px] mr-auto"
+                style={{ color: "var(--sim-muted)" }}
+              >
                 سؤال {questionHistoryIndex + 1}
               </span>
             </div>
 
             {/* Question text */}
             <div className="mb-5">
-              <p className="text-base font-semibold leading-7" style={{ color: "var(--sim-fg)" }}>
+              <p
+                className="text-base font-semibold leading-7"
+                style={{ color: "var(--sim-fg)" }}
+              >
                 {currentQuestion.questionText}
               </p>
             </div>
@@ -214,12 +274,22 @@ export function DynamicQuestions() {
                     bg = "#d9f0e4";
                     border = "#16a34a";
                     color = "#065f46";
-                    icon = <CheckCircle2 className="w-5 h-5" style={{ color: "#16a34a" }} />;
+                    icon = (
+                      <CheckCircle2
+                        className="w-5 h-5"
+                        style={{ color: "#16a34a" }}
+                      />
+                    );
                   } else if (isSelected) {
                     bg = "#fee2e2";
                     border = "#dc2626";
                     color = "#991b1b";
-                    icon = <XCircle className="w-5 h-5" style={{ color: "#dc2626" }} />;
+                    icon = (
+                      <XCircle
+                        className="w-5 h-5"
+                        style={{ color: "#dc2626" }}
+                      />
+                    );
                   }
                 }
 
@@ -239,13 +309,23 @@ export function DynamicQuestions() {
                     <span
                       className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
                       style={{
-                        background: showResult && isCorrect ? "#16a34a" : showResult && isSelected ? "#dc2626" : "var(--sim-accent-soft)",
-                        color: showResult && (isCorrect || isSelected) ? "#fff" : "var(--sim-accent)",
+                        background:
+                          showResult && isCorrect
+                            ? "#16a34a"
+                            : showResult && isSelected
+                              ? "#dc2626"
+                              : "var(--sim-accent-soft)",
+                        color:
+                          showResult && (isCorrect || isSelected)
+                            ? "#fff"
+                            : "var(--sim-accent)",
                       }}
                     >
                       {i + 1}
                     </span>
-                    <span className="text-sm font-semibold flex-1">{opt.label}</span>
+                    <span className="text-sm font-semibold flex-1">
+                      {opt.label}
+                    </span>
                     {icon}
                   </button>
                 );
@@ -271,57 +351,150 @@ export function DynamicQuestions() {
                   >
                     <div className="flex items-center gap-2 mb-2">
                       {correct ? (
-                        <CheckCircle2 className="w-5 h-5" style={{ color: "#16a34a" }} />
+                        <CheckCircle2
+                          className="w-5 h-5"
+                          style={{ color: "#16a34a" }}
+                        />
                       ) : (
-                        <XCircle className="w-5 h-5" style={{ color: "#dc2626" }} />
+                        <XCircle
+                          className="w-5 h-5"
+                          style={{ color: "#dc2626" }}
+                        />
                       )}
-                      <span className="text-sm font-extrabold" style={{ color: correct ? "#065f46" : "#991b1b" }}>
+                      <span
+                        className="text-sm font-extrabold"
+                        style={{ color: correct ? "#065f46" : "#991b1b" }}
+                      >
                         {correct ? "آفرین! درست جواب دادی" : "پاسخ نادرست"}
                       </span>
                     </div>
                     <div className="flex items-start gap-1.5 mb-2">
-                      <Lightbulb className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "var(--sim-accent)" }} />
+                      <Lightbulb
+                        className="w-4 h-4 flex-shrink-0 mt-0.5"
+                        style={{ color: "var(--sim-accent)" }}
+                      />
                       <div>
-                        <div className="text-[11px] font-bold mb-1" style={{ color: "var(--sim-accent)" }}>توضیح علمی:</div>
-                        <p className="text-xs leading-5" style={{ color: "var(--sim-fg)" }}>
+                        <div
+                          className="text-[11px] font-bold mb-1"
+                          style={{ color: "var(--sim-accent)" }}
+                        >
+                          توضیح علمی:
+                        </div>
+                        <p
+                          className="text-xs leading-5"
+                          style={{ color: "var(--sim-fg)" }}
+                        >
                           {currentQuestion.explanation}
                         </p>
                       </div>
                     </div>
                     {/* Correct answer — always shown clearly when wrong */}
                     {!correct && (
-                      <div className="text-sm leading-5 mt-3 p-3 rounded-lg flex items-center gap-2" style={{ background: "#d9f0e4", border: "2px solid #16a34a" }}>
-                        <CheckCircle2 className="w-5 h-5 flex-shrink-0" style={{ color: "#16a34a" }} />
+                      <div
+                        className="text-sm leading-5 mt-3 p-3 rounded-lg flex items-center gap-2"
+                        style={{
+                          background: "#d9f0e4",
+                          border: "2px solid #16a34a",
+                        }}
+                      >
+                        <CheckCircle2
+                          className="w-5 h-5 flex-shrink-0"
+                          style={{ color: "#16a34a" }}
+                        />
                         <div>
-                          <span className="font-bold" style={{ color: "#065f46" }}>پاسخ صحیح: </span>
-                          <span className="font-extrabold" style={{ color: "#065f46" }}>
-                            {currentQuestion.options.find((o) => o.value === currentQuestion.correctAnswer)?.label}
+                          <span
+                            className="font-bold"
+                            style={{ color: "#065f46" }}
+                          >
+                            پاسخ صحیح:{" "}
+                          </span>
+                          <span
+                            className="font-extrabold"
+                            style={{ color: "#065f46" }}
+                          >
+                            {
+                              currentQuestion.options.find(
+                                (o) =>
+                                  o.value === currentQuestion.correctAnswer,
+                              )?.label
+                            }
                           </span>
                         </div>
                       </div>
                     )}
                     {/* Why the selected wrong answer is wrong */}
-                    {!correct && questionSelectedAnswer && currentQuestion.wrongExplanations && currentQuestion.wrongExplanations[questionSelectedAnswer] && (
-                      <div className="text-xs leading-5 mt-2 p-3 rounded-lg" style={{ background: "#fff", border: "1px solid #fca5a5" }}>
-                        <span className="font-bold" style={{ color: "#991b1b" }}>چرا پاسخ شما نادرست است؟ </span>
-                        <span style={{ color: "var(--sim-fg)" }}>{currentQuestion.wrongExplanations[questionSelectedAnswer]}</span>
-                      </div>
-                    )}
+                    {!correct &&
+                      questionSelectedAnswer &&
+                      currentQuestion.wrongExplanations &&
+                      currentQuestion.wrongExplanations[
+                        questionSelectedAnswer
+                      ] && (
+                        <div
+                          className="text-xs leading-5 mt-2 p-3 rounded-lg"
+                          style={{
+                            background: "#fff",
+                            border: "1px solid #fca5a5",
+                          }}
+                        >
+                          <span
+                            className="font-bold"
+                            style={{ color: "#991b1b" }}
+                          >
+                            چرا پاسخ شما نادرست است؟{" "}
+                          </span>
+                          <span style={{ color: "var(--sim-fg)" }}>
+                            {
+                              currentQuestion.wrongExplanations[
+                                questionSelectedAnswer
+                              ]
+                            }
+                          </span>
+                        </div>
+                      )}
                     {/* Why other wrong options are wrong */}
                     {!correct && currentQuestion.wrongExplanations && (
-                      <div className="text-[11px] leading-5 mt-2 p-3 rounded-lg" style={{ background: "#f8fafc", border: "1px solid var(--sim-border)" }}>
-                        <div className="font-bold mb-1" style={{ color: "var(--sim-muted)" }}>بررسی سایر گزینه‌ها:</div>
+                      <div
+                        className="text-[11px] leading-5 mt-2 p-3 rounded-lg"
+                        style={{
+                          background: "#f8fafc",
+                          border: "1px solid var(--sim-border)",
+                        }}
+                      >
+                        <div
+                          className="font-bold mb-1"
+                          style={{ color: "var(--sim-muted)" }}
+                        >
+                          بررسی سایر گزینه‌ها:
+                        </div>
                         {currentQuestion.options
-                          .filter((o) => o.value !== currentQuestion.correctAnswer && o.value !== questionSelectedAnswer)
+                          .filter(
+                            (o) =>
+                              o.value !== currentQuestion.correctAnswer &&
+                              o.value !== questionSelectedAnswer,
+                          )
                           .map((o) => {
-                            const why = currentQuestion.wrongExplanations?.[o.value];
+                            const why =
+                              currentQuestion.wrongExplanations?.[o.value];
                             if (!why) return null;
                             return (
-                              <div key={o.value} className="mb-1.5 flex gap-1.5">
-                                <XCircle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: "#dc2626" }} />
+                              <div
+                                key={o.value}
+                                className="mb-1.5 flex gap-1.5"
+                              >
+                                <XCircle
+                                  className="w-3.5 h-3.5 flex-shrink-0 mt-0.5"
+                                  style={{ color: "#dc2626" }}
+                                />
                                 <div>
-                                  <span className="font-semibold" style={{ color: "var(--sim-fg)" }}>«{o.label}»:</span>{" "}
-                                  <span style={{ color: "var(--sim-muted)" }}>{why}</span>
+                                  <span
+                                    className="font-semibold"
+                                    style={{ color: "var(--sim-fg)" }}
+                                  >
+                                    «{o.label}»:
+                                  </span>{" "}
+                                  <span style={{ color: "var(--sim-muted)" }}>
+                                    {why}
+                                  </span>
                                 </div>
                               </div>
                             );
@@ -331,13 +504,51 @@ export function DynamicQuestions() {
                   </div>
 
                   {/* Scenario info */}
-                  <div className="mt-3 p-3 rounded-xl text-[11px]" style={{ background: "#eaf4fc", border: "1px solid var(--sim-border)" }}>
-                    <div className="font-bold mb-1" style={{ color: "var(--sim-accent)" }}>سناریوی آزمایش:</div>
-                    <div className="grid grid-cols-2 gap-1" style={{ color: "var(--sim-fg)" }}>
-                      <div>بار الکتروسکوپ: <b>{chargeLabel(currentQuestion.scenario.electroscopeCharge)}</b></div>
-                      <div>بار میله: <b>{chargeLabel(currentQuestion.scenario.rodCharge)}</b></div>
-                      <div>نوع آزمایش: <b>{currentQuestion.scenario.experimentType === "contact" ? "تماس" : "نزدیک کردن"}</b></div>
-                      <div>مقدار بار: <b>{magnitudeLabel(currentQuestion.scenario.rodMagnitude)}</b></div>
+                  <div
+                    className="mt-3 p-3 rounded-xl text-[11px]"
+                    style={{
+                      background: "#eaf4fc",
+                      border: "1px solid var(--sim-border)",
+                    }}
+                  >
+                    <div
+                      className="font-bold mb-1"
+                      style={{ color: "var(--sim-accent)" }}
+                    >
+                      سناریوی آزمایش:
+                    </div>
+                    <div
+                      className="grid grid-cols-2 gap-1"
+                      style={{ color: "var(--sim-fg)" }}
+                    >
+                      <div>
+                        بار الکتروسکوپ:{" "}
+                        <b>
+                          {chargeLabel(
+                            currentQuestion.scenario.electroscopeCharge,
+                          )}
+                        </b>
+                      </div>
+                      <div>
+                        بار میله:{" "}
+                        <b>{chargeLabel(currentQuestion.scenario.rodCharge)}</b>
+                      </div>
+                      <div>
+                        نوع آزمایش:{" "}
+                        <b>
+                          {currentQuestion.scenario.experimentType === "contact"
+                            ? "تماس"
+                            : "نزدیک کردن"}
+                        </b>
+                      </div>
+                      <div>
+                        مقدار بار:{" "}
+                        <b>
+                          {magnitudeLabel(
+                            currentQuestion.scenario.rodMagnitude,
+                          )}
+                        </b>
+                      </div>
                     </div>
                   </div>
 
@@ -398,9 +609,13 @@ export function DynamicQuestions() {
       </AnimatePresence>
 
       {/* Footer info */}
-      <div className="text-center text-[11px] mt-4" style={{ color: "var(--sim-muted)" }}>
+      <div
+        className="text-center text-[11px] mt-4"
+        style={{ color: "var(--sim-muted)" }}
+      >
         <Sparkles className="w-3 h-3 inline-block ml-1" />
-        هر سؤال به‌صورت تصادفی از موتور فیزیک تولید می‌شود — هر بار یک آزمایش جدید!
+        هر سؤال به‌صورت تصادفی از موتور فیزیک تولید می‌شود — هر بار یک آزمایش
+        جدید!
       </div>
 
       {/* Report Question Modal */}
@@ -419,7 +634,13 @@ export function DynamicQuestions() {
 
 // ===== Practice Report Card =====
 
-function PracticeReport({ onReset, onExit }: { onReset: () => void; onExit: () => void }) {
+function PracticeReport({
+  onReset,
+  onExit,
+}: {
+  onReset: () => void;
+  onExit: () => void;
+}) {
   const questionCorrectCount = useSimStore((s) => s.questionCorrectCount);
   const questionWrongCount = useSimStore((s) => s.questionWrongCount);
   const questionTotalCount = useSimStore((s) => s.questionTotalCount);
@@ -432,10 +653,14 @@ function PracticeReport({ onReset, onExit }: { onReset: () => void; onExit: () =
   // Score with negative marking: each correct = +3, each wrong = -1
   const rawScore = correct * 3 - wrong * 1;
   const maxScore = total * 3;
-  const percentage = total > 0 ? Math.max(0, Math.round((rawScore / maxScore) * 100)) : 0;
+  const percentage =
+    total > 0 ? Math.max(0, Math.round((rawScore / maxScore) * 100)) : 0;
 
   // Analyze strengths and weaknesses by question type
-  const typeStats: Record<string, { correct: number; wrong: number; total: number }> = {};
+  const typeStats: Record<
+    string,
+    { correct: number; wrong: number; total: number }
+  > = {};
   questionHistory.forEach((h) => {
     const type = h.question.type;
     if (!typeStats[type]) typeStats[type] = { correct: 0, wrong: 0, total: 0 };
@@ -460,23 +685,35 @@ function PracticeReport({ onReset, onExit }: { onReset: () => void; onExit: () =
 
   // Generate suggestions based on weaknesses
   if (weaknesses.length === 0 && total > 0) {
-    suggestions.push("عملکرد عالی! در همه انواع سؤال قوی هستی. می‌توانی سطوح سخت‌تر را امتحان کنی.");
+    suggestions.push(
+      "عملکرد عالی! در همه انواع سؤال قوی هستی. می‌توانی سطوح سخت‌تر را امتحان کنی.",
+    );
   } else {
     weaknesses.forEach((w) => {
       if (w.includes("پیش‌بینی")) {
-        suggestions.push("مفهوم القا و اثر نزدیک‌کردن میله را مرور کن — به توزیع بار در الکتروسکوپ دقت کن.");
+        suggestions.push(
+          "مفهوم القا و اثر نزدیک‌کردن میله را مرور کن — به توزیع بار در الکتروسکوپ دقت کن.",
+        );
       }
       if (w.includes("تشخیص بار")) {
-        suggestions.push("جدول الکتریسیته مالشی و علامت بارها را دوباره مرور کن.");
+        suggestions.push(
+          "جدول الکتریسیته مالشی و علامت بارها را دوباره مرور کن.",
+        );
       }
       if (w.includes("نوع آزمایش")) {
-        suggestions.push("تفاوت بین نزدیک‌کردن (القا) و تماس (انتقال بار) را در شبیه‌ساز امتحان کن.");
+        suggestions.push(
+          "تفاوت بین نزدیک‌کردن (القا) و تماس (انتقال بار) را در شبیه‌ساز امتحان کن.",
+        );
       }
       if (w.includes("تحلیل")) {
-        suggestions.push("دلیل فیزیکی باز/بسته شدن تیغه‌ها را در حالت‌های مختلف مرور کن.");
+        suggestions.push(
+          "دلیل فیزیکی باز/بسته شدن تیغه‌ها را در حالت‌های مختلف مرور کن.",
+        );
       }
       if (w.includes("خطا")) {
-        suggestions.push("قوانین فیزیک الکتروستاتیک را مرور کن تا بتوانی نتایج نادرست را تشخیص دهی.");
+        suggestions.push(
+          "قوانین فیزیک الکتروستاتیک را مرور کن تا بتوانی نتایج نادرست را تشخیص دهی.",
+        );
       }
     });
   }
@@ -484,16 +721,41 @@ function PracticeReport({ onReset, onExit }: { onReset: () => void; onExit: () =
   if (total === 0) {
     return (
       <div className="max-w-2xl mx-auto">
-        <Card className="p-8 text-center" style={{ background: "var(--sim-card)", borderColor: "var(--sim-border)" }}>
-          <BookOpen className="w-12 h-12 mx-auto mb-3" style={{ color: "var(--sim-muted)" }} />
-          <h2 className="text-lg font-bold mb-2" style={{ color: "var(--sim-fg)" }}>هنوز سؤالی پاسخ نداده‌ای</h2>
-          <p className="text-sm mb-4" style={{ color: "var(--sim-muted)" }}>برای دریافت کارنامه، ابتدا چند سؤال را پاسخ بده.</p>
+        <Card
+          className="p-8 text-center"
+          style={{
+            background: "var(--sim-card)",
+            borderColor: "var(--sim-border)",
+          }}
+        >
+          <BookOpen
+            className="w-12 h-12 mx-auto mb-3"
+            style={{ color: "var(--sim-muted)" }}
+          />
+          <h2
+            className="text-lg font-bold mb-2"
+            style={{ color: "var(--sim-fg)" }}
+          >
+            هنوز سؤالی پاسخ نداده‌ای
+          </h2>
+          <p className="text-sm mb-4" style={{ color: "var(--sim-muted)" }}>
+            برای دریافت کارنامه، ابتدا چند سؤال را پاسخ بده.
+          </p>
           <div className="flex gap-2 justify-center">
-            <Button onClick={onReset} style={{ background: "var(--sim-accent)", color: "#fff" }} className="gap-1.5">
+            <Button
+              onClick={onReset}
+              style={{ background: "var(--sim-accent)", color: "#fff" }}
+              className="gap-1.5"
+            >
               <RotateCcw className="w-4 h-4" />
               شروع تمرین
             </Button>
-            <Button variant="outline" onClick={onExit} style={{ borderColor: "var(--sim-border)" }} className="gap-1.5">
+            <Button
+              variant="outline"
+              onClick={onExit}
+              style={{ borderColor: "var(--sim-border)" }}
+              className="gap-1.5"
+            >
               <ArrowLeft className="w-4 h-4" />
               بازگشت
             </Button>
@@ -503,47 +765,142 @@ function PracticeReport({ onReset, onExit }: { onReset: () => void; onExit: () =
     );
   }
 
-  const grade = percentage >= 90 ? "عالی" : percentage >= 75 ? "خوب" : percentage >= 50 ? "متوسط" : "نیاز به تمرین";
-  const gradeColor = percentage >= 75 ? "#16a34a" : percentage >= 50 ? "#d97706" : "#dc2626";
-  const gradeEmoji = percentage >= 90 ? "🏆" : percentage >= 75 ? "🎉" : percentage >= 50 ? "📚" : "💪";
+  const grade =
+    percentage >= 90
+      ? "عالی"
+      : percentage >= 75
+        ? "خوب"
+        : percentage >= 50
+          ? "متوسط"
+          : "نیاز به تمرین";
+  const gradeColor =
+    percentage >= 75 ? "#16a34a" : percentage >= 50 ? "#d97706" : "#dc2626";
+  const gradeEmoji =
+    percentage >= 90
+      ? "🏆"
+      : percentage >= 75
+        ? "🎉"
+        : percentage >= 50
+          ? "📚"
+          : "💪";
 
   return (
     <div className="max-w-2xl mx-auto">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <Card className="p-6 mb-4" style={{ background: "var(--sim-card)", borderColor: "var(--sim-border)" }}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <Card
+          className="p-6 mb-4"
+          style={{
+            background: "var(--sim-card)",
+            borderColor: "var(--sim-border)",
+          }}
+        >
           {/* Header */}
           <div className="text-center mb-5">
             <div className="text-5xl mb-2">{gradeEmoji}</div>
-            <h1 className="text-xl font-extrabold mb-1" style={{ color: "var(--sim-fg)" }}>کارنامه تحلیلی</h1>
-            <p className="text-xs" style={{ color: "var(--sim-muted)" }}>گزارش عملکرد شما در تمرین سؤالات پویا</p>
+            <h1
+              className="text-xl font-extrabold mb-1"
+              style={{ color: "var(--sim-fg)" }}
+            >
+              کارنامه تحلیلی
+            </h1>
+            <p className="text-xs" style={{ color: "var(--sim-muted)" }}>
+              گزارش عملکرد شما در تمرین سؤالات پویا
+            </p>
           </div>
 
           {/* Score summary */}
           <div className="grid grid-cols-3 gap-3 mb-5">
-            <div className="text-center p-3 rounded-xl" style={{ background: "#d9f0e4", border: "1px solid #a7e8c8" }}>
-              <CheckCircle2 className="w-6 h-6 mx-auto mb-1" style={{ color: "#16a34a" }} />
-              <div className="text-2xl font-extrabold" style={{ color: "#065f46" }}>{correct}</div>
-              <div className="text-[10px]" style={{ color: "#065f46" }}>درست</div>
+            <div
+              className="text-center p-3 rounded-xl"
+              style={{ background: "#d9f0e4", border: "1px solid #a7e8c8" }}
+            >
+              <CheckCircle2
+                className="w-6 h-6 mx-auto mb-1"
+                style={{ color: "#16a34a" }}
+              />
+              <div
+                className="text-2xl font-extrabold"
+                style={{ color: "#065f46" }}
+              >
+                {correct}
+              </div>
+              <div className="text-[10px]" style={{ color: "#065f46" }}>
+                درست
+              </div>
             </div>
-            <div className="text-center p-3 rounded-xl" style={{ background: "#fee2e2", border: "1px solid #fca5a5" }}>
-              <XCircle className="w-6 h-6 mx-auto mb-1" style={{ color: "#dc2626" }} />
-              <div className="text-2xl font-extrabold" style={{ color: "#991b1b" }}>{wrong}</div>
-              <div className="text-[10px]" style={{ color: "#991b1b" }}>نادرست</div>
+            <div
+              className="text-center p-3 rounded-xl"
+              style={{ background: "#fee2e2", border: "1px solid #fca5a5" }}
+            >
+              <XCircle
+                className="w-6 h-6 mx-auto mb-1"
+                style={{ color: "#dc2626" }}
+              />
+              <div
+                className="text-2xl font-extrabold"
+                style={{ color: "#991b1b" }}
+              >
+                {wrong}
+              </div>
+              <div className="text-[10px]" style={{ color: "#991b1b" }}>
+                نادرست
+              </div>
             </div>
-            <div className="text-center p-3 rounded-xl" style={{ background: "#eaf4fc", border: "1px solid var(--sim-border)" }}>
-              <Trophy className="w-6 h-6 mx-auto mb-1" style={{ color: "var(--sim-accent)" }} />
-              <div className="text-2xl font-extrabold" style={{ color: "var(--sim-accent)" }}>{percentage}%</div>
-              <div className="text-[10px]" style={{ color: "var(--sim-muted)" }}>درصد نهایی</div>
+            <div
+              className="text-center p-3 rounded-xl"
+              style={{
+                background: "#eaf4fc",
+                border: "1px solid var(--sim-border)",
+              }}
+            >
+              <Trophy
+                className="w-6 h-6 mx-auto mb-1"
+                style={{ color: "var(--sim-accent)" }}
+              />
+              <div
+                className="text-2xl font-extrabold"
+                style={{ color: "var(--sim-accent)" }}
+              >
+                {percentage}%
+              </div>
+              <div
+                className="text-[10px]"
+                style={{ color: "var(--sim-muted)" }}
+              >
+                درصد نهایی
+              </div>
             </div>
           </div>
 
           {/* Grade + score detail */}
-          <div className="rounded-xl p-4 mb-4" style={{ background: "var(--sim-accent-soft)", border: "1px solid var(--sim-border)" }}>
+          <div
+            className="rounded-xl p-4 mb-4"
+            style={{
+              background: "var(--sim-accent-soft)",
+              border: "1px solid var(--sim-border)",
+            }}
+          >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-bold" style={{ color: "var(--sim-fg)" }}>ارزیابی:</span>
-              <span className="text-sm font-extrabold px-3 py-1 rounded-full" style={{ background: gradeColor, color: "#fff" }}>{grade}</span>
+              <span
+                className="text-sm font-bold"
+                style={{ color: "var(--sim-fg)" }}
+              >
+                ارزیابی:
+              </span>
+              <span
+                className="text-sm font-extrabold px-3 py-1 rounded-full"
+                style={{ background: gradeColor, color: "#fff" }}
+              >
+                {grade}
+              </span>
             </div>
-            <div className="flex items-center justify-between text-xs" style={{ color: "var(--sim-muted)" }}>
+            <div
+              className="flex items-center justify-between text-xs"
+              style={{ color: "var(--sim-muted)" }}
+            >
               <span>نمره (با احتساب نمره منفی):</span>
               <span className="font-bold" style={{ color: "var(--sim-fg)" }}>
                 {rawScore} از {maxScore} (هر درست: +۳، هر نادرست: −۱)
@@ -556,11 +913,20 @@ function PracticeReport({ onReset, onExit }: { onReset: () => void; onExit: () =
             <div className="mb-4">
               <div className="flex items-center gap-1.5 mb-2">
                 <TrendingUp className="w-4 h-4" style={{ color: "#16a34a" }} />
-                <span className="text-sm font-bold" style={{ color: "#065f46" }}>نقاط قوت</span>
+                <span
+                  className="text-sm font-bold"
+                  style={{ color: "#065f46" }}
+                >
+                  نقاط قوت
+                </span>
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {strengths.map((s, i) => (
-                  <span key={i} className="text-[11px] font-semibold px-2.5 py-1 rounded-full" style={{ background: "#d9f0e4", color: "#065f46" }}>
+                  <span
+                    key={i}
+                    className="text-[11px] font-semibold px-2.5 py-1 rounded-full"
+                    style={{ background: "#d9f0e4", color: "#065f46" }}
+                  >
                     ✓ {s}
                   </span>
                 ))}
@@ -572,12 +938,24 @@ function PracticeReport({ onReset, onExit }: { onReset: () => void; onExit: () =
           {weaknesses.length > 0 && (
             <div className="mb-4">
               <div className="flex items-center gap-1.5 mb-2">
-                <TrendingDown className="w-4 h-4" style={{ color: "#dc2626" }} />
-                <span className="text-sm font-bold" style={{ color: "#991b1b" }}>نقاط ضعف</span>
+                <TrendingDown
+                  className="w-4 h-4"
+                  style={{ color: "#dc2626" }}
+                />
+                <span
+                  className="text-sm font-bold"
+                  style={{ color: "#991b1b" }}
+                >
+                  نقاط ضعف
+                </span>
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {weaknesses.map((w, i) => (
-                  <span key={i} className="text-[11px] font-semibold px-2.5 py-1 rounded-full" style={{ background: "#fee2e2", color: "#991b1b" }}>
+                  <span
+                    key={i}
+                    className="text-[11px] font-semibold px-2.5 py-1 rounded-full"
+                    style={{ background: "#fee2e2", color: "#991b1b" }}
+                  >
                     ✗ {w}
                   </span>
                 ))}
@@ -589,12 +967,24 @@ function PracticeReport({ onReset, onExit }: { onReset: () => void; onExit: () =
           {suggestions.length > 0 && (
             <div className="mb-4">
               <div className="flex items-center gap-1.5 mb-2">
-                <Target className="w-4 h-4" style={{ color: "var(--sim-accent)" }} />
-                <span className="text-sm font-bold" style={{ color: "var(--sim-accent)" }}>پیشنهاد برای مطالعه</span>
+                <Target
+                  className="w-4 h-4"
+                  style={{ color: "var(--sim-accent)" }}
+                />
+                <span
+                  className="text-sm font-bold"
+                  style={{ color: "var(--sim-accent)" }}
+                >
+                  پیشنهاد برای مطالعه
+                </span>
               </div>
               <ul className="space-y-1.5">
                 {suggestions.map((s, i) => (
-                  <li key={i} className="text-xs leading-5 flex gap-1.5" style={{ color: "var(--sim-fg)" }}>
+                  <li
+                    key={i}
+                    className="text-xs leading-5 flex gap-1.5"
+                    style={{ color: "var(--sim-fg)" }}
+                  >
                     <span style={{ color: "var(--sim-accent)" }}>•</span>
                     <span>{s}</span>
                   </li>
@@ -605,11 +995,20 @@ function PracticeReport({ onReset, onExit }: { onReset: () => void; onExit: () =
 
           {/* Action buttons */}
           <div className="flex gap-2 mt-5">
-            <Button onClick={onReset} className="flex-1 gap-1.5" style={{ background: "var(--sim-accent)", color: "#fff" }}>
+            <Button
+              onClick={onReset}
+              className="flex-1 gap-1.5"
+              style={{ background: "var(--sim-accent)", color: "#fff" }}
+            >
               <RotateCcw className="w-4 h-4" />
               تمرین مجدد
             </Button>
-            <Button variant="outline" onClick={onExit} className="flex-1 gap-1.5" style={{ borderColor: "var(--sim-border)" }}>
+            <Button
+              variant="outline"
+              onClick={onExit}
+              className="flex-1 gap-1.5"
+              style={{ borderColor: "var(--sim-border)" }}
+            >
               <ArrowLeft className="w-4 h-4" />
               بازگشت به اصلی
             </Button>
@@ -634,21 +1033,31 @@ function magnitudeLabel(mag: string): string {
 
 // ===== Report Question Modal =====
 
-function ReportQuestionModal({ question, selectedAnswer, onClose }: {
+function ReportQuestionModal({
+  question,
+  selectedAnswer,
+  onClose,
+}: {
   question: any;
   selectedAnswer: string | null;
   onClose: () => void;
 }) {
   const [note, setNote] = useState("");
   const [userEmail, setUserEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">(
+    "idle",
+  );
   const [errMsg, setErrMsg] = useState("");
 
   const handleSend = async () => {
     setStatus("sending");
     try {
-      const correctOption = question?.options?.find((o: any) => o.value === question?.correctAnswer);
-      const correctLabel = correctOption ? correctOption.label : question?.correctAnswer;
+      const correctOption = question?.options?.find(
+        (o: any) => o.value === question?.correctAnswer,
+      );
+      const correctLabel = correctOption
+        ? correctOption.label
+        : question?.correctAnswer;
 
       const optionsText = (question?.options || [])
         .map((o: any, i: number) => {
@@ -664,12 +1073,19 @@ function ReportQuestionModal({ question, selectedAnswer, onClose }: {
         })
         .join("\n");
 
-      const wrongText = question?.wrongExplanations && Object.keys(question.wrongExplanations).length > 0
-        ? "\n\nبررسی علت نادرستی سایر گزینه‌ها:\n" + Object.entries(question.wrongExplanations).map(([val, reason]: [string, any]) => {
-            const opt = (question?.options || []).find((o: any) => o.value === val);
-            return `- «${opt ? opt.label : val}»: ${reason}`;
-          }).join("\n")
-        : "";
+      const wrongText =
+        question?.wrongExplanations &&
+        Object.keys(question.wrongExplanations).length > 0
+          ? "\n\nبررسی علت نادرستی سایر گزینه‌ها:\n" +
+            Object.entries(question.wrongExplanations)
+              .map(([val, reason]: [string, any]) => {
+                const opt = (question?.options || []).find(
+                  (o: any) => o.value === val,
+                );
+                return `- «${opt ? opt.label : val}»: ${reason}`;
+              })
+              .join("\n")
+          : "";
 
       const emailText = `گزارش سؤال نادرست — شبیه‌ساز الکتروسکوپ
 
@@ -738,35 +1154,71 @@ ${wrongText}
     >
       <motion.div
         className="w-full max-w-md rounded-3xl p-6 max-h-[90vh] overflow-y-auto sim-scroll"
-        style={{ background: "var(--sim-card)", border: "1px solid var(--sim-border)" }}
+        style={{
+          background: "var(--sim-card)",
+          border: "1px solid var(--sim-border)",
+        }}
         initial={{ y: 20, scale: 0.96 }}
         animate={{ y: 0, scale: 1 }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-2 mb-4">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "#fef3c7", color: "#d97706" }}>
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center"
+            style={{ background: "#fef3c7", color: "#d97706" }}
+          >
             <AlertCircle className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-lg font-extrabold" style={{ color: "var(--sim-fg)" }}>گزارش سؤال</h2>
-            <p className="text-[11px]" style={{ color: "var(--sim-muted)" }}>اگر این سؤال از نظر علمی نادرست است، گزارش کنید</p>
+            <h2
+              className="text-lg font-extrabold"
+              style={{ color: "var(--sim-fg)" }}
+            >
+              گزارش سؤال
+            </h2>
+            <p className="text-[11px]" style={{ color: "var(--sim-muted)" }}>
+              اگر این سؤال از نظر علمی نادرست است، گزارش کنید
+            </p>
           </div>
         </div>
 
         {/* Question summary */}
-        <div className="rounded-xl p-3 mb-3 text-[11px] max-h-32 overflow-y-auto sim-scroll" style={{ background: "#eaf4fc", border: "1px solid var(--sim-border)" }}>
-          <div className="font-bold mb-1" style={{ color: "var(--sim-accent)" }}>متن سؤال:</div>
-          <p className="leading-5 mb-2" style={{ color: "var(--sim-fg)" }}>{question?.questionText}</p>
-          <div className="font-bold mb-1" style={{ color: "#16a34a" }}>پاسخ صحیح:</div>
+        <div
+          className="rounded-xl p-3 mb-3 text-[11px] max-h-32 overflow-y-auto sim-scroll"
+          style={{
+            background: "#eaf4fc",
+            border: "1px solid var(--sim-border)",
+          }}
+        >
+          <div
+            className="font-bold mb-1"
+            style={{ color: "var(--sim-accent)" }}
+          >
+            متن سؤال:
+          </div>
+          <p className="leading-5 mb-2" style={{ color: "var(--sim-fg)" }}>
+            {question?.questionText}
+          </p>
+          <div className="font-bold mb-1" style={{ color: "#16a34a" }}>
+            پاسخ صحیح:
+          </div>
           <p className="leading-5" style={{ color: "var(--sim-fg)" }}>
-            {question?.options?.find((o: any) => o.value === question?.correctAnswer)?.label}
+            {
+              question?.options?.find(
+                (o: any) => o.value === question?.correctAnswer,
+              )?.label
+            }
           </p>
         </div>
 
         {/* Note input */}
         <textarea
           className="w-full p-3 rounded-xl text-sm mb-3 resize-none"
-          style={{ background: "#ffffff", border: "1px solid var(--sim-border)", color: "var(--sim-fg)" }}
+          style={{
+            background: "#ffffff",
+            border: "1px solid var(--sim-border)",
+            color: "var(--sim-fg)",
+          }}
           rows={2}
           placeholder="توضیح: چه مشکلی در این سؤال دیدید؟ (اختیاری)"
           value={note}
@@ -778,7 +1230,11 @@ ${wrongText}
         <input
           type="email"
           className="w-full p-3 rounded-xl text-sm mb-1"
-          style={{ background: "#ffffff", border: "1px solid var(--sim-border)", color: "var(--sim-fg)" }}
+          style={{
+            background: "#ffffff",
+            border: "1px solid var(--sim-border)",
+            color: "var(--sim-fg)",
+          }}
           placeholder="ایمیل شما (اختیاری)"
           value={userEmail}
           onChange={(e) => setUserEmail(e.target.value)}
@@ -790,14 +1246,24 @@ ${wrongText}
 
         {/* Status */}
         {status === "sent" && (
-          <div className="text-center text-sm font-bold mb-3 p-2 rounded-lg" style={{ background: "#d9f0e4", color: "#065f46" }}>
+          <div
+            className="text-center text-sm font-bold mb-3 p-2 rounded-lg"
+            style={{ background: "#d9f0e4", color: "#065f46" }}
+          >
             ✅ گزارش شما ثبت شد. متشکریم!
           </div>
         )}
         {status === "error" && (
-          <div className="text-center text-sm font-bold mb-3 p-2 rounded-lg" style={{ background: "#fee2e2", color: "#991b1b" }}>
+          <div
+            className="text-center text-sm font-bold mb-3 p-2 rounded-lg"
+            style={{ background: "#fee2e2", color: "#991b1b" }}
+          >
             خطا در ثبت گزارش. دوباره تلاش کنید.
-            {errMsg && <div className="text-[10px] mt-1" style={{ color: "#991b1b" }}>{errMsg}</div>}
+            {errMsg && (
+              <div className="text-[10px] mt-1" style={{ color: "#991b1b" }}>
+                {errMsg}
+              </div>
+            )}
           </div>
         )}
 
@@ -817,7 +1283,9 @@ ${wrongText}
             disabled={status === "sending" || status === "sent"}
             style={{ background: "#d97706", color: "#fff" }}
           >
-            {status === "sending" ? "در حال ارسال..." : (
+            {status === "sending" ? (
+              "در حال ارسال..."
+            ) : (
               <>
                 <Send className="w-4 h-4" />
                 ارسال گزارش

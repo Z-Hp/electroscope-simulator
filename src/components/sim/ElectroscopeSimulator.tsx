@@ -41,7 +41,7 @@ export function ElectroscopeSimulator() {
   const netInfo = chargeLabel(netCharge);
 
   return (
-    <div className="grid lg:grid-cols-[260px_1fr_280px] gap-4 h-full">
+    <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr_260px] gap-4 h-full">
       {/* Left tools */}
       <Card className="p-3 flex flex-col gap-3 sim-scroll overflow-y-auto" style={{ background: "var(--sim-card)", borderColor: "var(--sim-border)" }}>
         <h3 className="font-bold text-sm flex items-center gap-1.5">

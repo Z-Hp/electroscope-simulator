@@ -119,8 +119,9 @@ export function Electroscope({ width = 460, height = 430 }: Props) {
 
   // Drag handlers for vertical rod movement
   const handleRodPointerDown = (e: React.PointerEvent) => {
+    e.preventDefault();
     e.stopPropagation();
-    (e.currentTarget as Element).setPointerCapture(e.pointerId);
+    try { (e.currentTarget as Element).setPointerCapture(e.pointerId); } catch {}
     const svgY = clientToSvgY(e.clientY);
     if (svgY !== null) {
       dragOffsetRef.current = svgY - rodBottomY;
@@ -129,14 +130,16 @@ export function Electroscope({ width = 460, height = 430 }: Props) {
   };
   const handleRodPointerMove = (e: React.PointerEvent) => {
     if (!draggingRef.current) return;
+    e.preventDefault();
+    e.stopPropagation();
     const svgY = clientToSvgY(e.clientY);
     if (svgY === null) return;
     const newRodBottomY = svgY - dragOffsetRef.current;
-    // Convert rod bottom Y to distance: 0 = touching (rodTouchY), 1 = far (rodFarY)
     const newDistance = (rodTouchY - newRodBottomY) / rodTravel;
     setDistance(newDistance);
   };
   const handleRodPointerUp = (e: React.PointerEvent) => {
+    e.preventDefault();
     draggingRef.current = false;
     try { (e.currentTarget as Element).releasePointerCapture(e.pointerId); } catch {}
   };
@@ -150,6 +153,7 @@ export function Electroscope({ width = 460, height = 430 }: Props) {
       className="select-none"
       role="img"
       aria-label="الکتروسکوپ"
+      style={{ touchAction: "none" }}
     >
       <defs>
         <linearGradient id="glassGrad" x1="0" y1="0" x2="0" y2="1">
@@ -577,7 +581,7 @@ function ExternalRod({
 
   return (
     <g
-      style={{ cursor: "ns-resize" }}
+      style={{ cursor: "ns-resize", touchAction: "none" }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}

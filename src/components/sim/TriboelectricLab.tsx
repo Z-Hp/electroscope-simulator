@@ -278,26 +278,27 @@ function RubStage({
 
   const handlePointerDown = (e: React.PointerEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); } catch {}
     dragStartRef.current = e.clientX;
     lastDirRef.current = 0;
     setDragging(true);
   };
   const handlePointerMove = (e: React.PointerEvent) => {
-    const start = dragStartRef.current;
-    if (start === null) return;
+    if (dragStartRef.current === null) return;
     e.preventDefault();
-    const dx = e.clientX - start;
+    e.stopPropagation();
+    const dx = e.clientX - dragStartRef.current;
     const clamped = Math.max(-50, Math.min(50, dx));
     setClothOffset(clamped);
-    const dir = Math.sign(clamped - lastDirRef.current);
-    if (Math.abs(clamped - lastDirRef.current) > 12) {
+    if (Math.abs(clamped - lastDirRef.current) > 10) {
       onRub(8);
       const rect = stageRef.current?.getBoundingClientRect();
       if (rect) {
         const sx = rect.width / 2 + (Math.random() - 0.5) * 60;
         const sy = rect.height / 2 + (Math.random() - 0.5) * 30;
         const id = sparkId.current++;
+        const dir = Math.sign(clamped - lastDirRef.current);
         const sdx = electronsFrom === "rod" ? (dir > 0 ? 40 : -40) : dir > 0 ? -40 : 40;
         setSparks((p) => [...p, { id, x: sx, y: sy, dx: sdx, dy: -20 - Math.random() * 20 }].slice(-14));
         setTimeout(() => setSparks((p) => p.filter((s) => s.id !== id)), 900);
@@ -306,6 +307,7 @@ function RubStage({
     }
   };
   const handlePointerUp = (e: React.PointerEvent) => {
+    e.preventDefault();
     try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId); } catch {}
     dragStartRef.current = null;
     lastDirRef.current = 0;
@@ -316,12 +318,12 @@ function RubStage({
   return (
     <div
       ref={stageRef}
-      className="relative flex-1 w-full flex items-center justify-center min-h-[280px] touch-none"
+      className="relative flex-1 w-full flex items-center justify-center min-h-[280px]"
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
-      onPointerLeave={handlePointerUp}
-      style={{ cursor: dragging ? "grabbing" : "grab", touchAction: "none" }}
+      onPointerCancel={handlePointerUp}
+      style={{ cursor: dragging ? "grabbing" : "grab", touchAction: "none", userSelect: "none", WebkitUserSelect: "none", WebkitTouchCallout: "none" }}
     >
       {/* sparks layer */}
       <div className="absolute inset-0 pointer-events-none">
